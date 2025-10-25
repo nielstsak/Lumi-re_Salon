@@ -1,7 +1,9 @@
-asgiref==3.9.2
-Django==5.2.6
-django-cors-headers==4.9.0
-djangorestframework==3.16.1
-pytz==2025.2
-sqlparse==0.5.3
-tzdata==2025.2
+django
+djangorestframework
+django-cors-headers
+gunicorn
+dj-database-url
+psycopg2-binary
+whitenoise
+python-dotenv
+pytz
