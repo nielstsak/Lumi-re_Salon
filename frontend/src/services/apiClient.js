@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-// Modifiez la baseURL pour inclure /api
 const apiClient = axios.create({
-  baseURL: 'https://lumi-re-salon.onrender.com/api',
+  // MODIFICATION : Retirez /api d'ici
+  baseURL: 'https://lumi-re-salon.onrender.com', 
   headers: {
     'Content-Type': 'application/json'
   }
