@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import axios from 'axios'; // Ajout de l'import axios direct
 import apiClient from '../services/apiClient';
 
 const AuthContext = createContext(null);
@@ -13,8 +14,7 @@ export const AuthProvider = ({ children }) => {
   const verifyToken = useCallback(async (storedToken) => {
     try {
       apiClient.defaults.headers.common['Authorization'] = `Token ${storedToken}`;
-      // Utilisation du chemin relatif pour vérifier le token aussi
-      const data = await apiClient.get('/api/users/me/'); 
+      const data = await apiClient.get('/users/me/');
       setUser({ username: data.username });
       setToken(storedToken);
     } catch (error) {
@@ -38,21 +38,26 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      // CORRECTION ICI: Utiliser le chemin relatif
-      const response = await apiClient.post('/api-token-auth/', { username, password });
-
-      const receivedToken = response.token;
+      const response = await axios.post('https://lumi-re-salon.onrender.com/api-token-auth/', { username, password });
+      const data = response.data;
+      
+      const receivedToken = data.token;
       if (receivedToken) {
         localStorage.setItem('authToken', receivedToken);
         apiClient.defaults.headers.common['Authorization'] = `Token ${receivedToken}`;
         setToken(receivedToken);
-        // Il serait mieux de récupérer le vrai username depuis l'API, mais ceci fonctionnera pour le moment
-        setUser({ username }); 
+        try {
+           const userData = await apiClient.get('/users/me/');
+           setUser({ username: userData.username });
+        } catch (userError) {
+           console.error("Failed to fetch user data after login:", userError);
+           setUser({ username });
+        }
         return true;
       }
       return false;
     } catch (error) {
-      console.error("Login failed:", error); // Ajout d'un log d'erreur
+      console.error("Login failed:", error);
       localStorage.removeItem('authToken');
       setToken(null);
       setUser(null);
